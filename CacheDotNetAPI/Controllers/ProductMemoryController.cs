@@ -17,14 +17,14 @@ namespace CacheDotNetAPI.Controllers
             _productService = productService;
         }
 
-        [HttpGet]
+        [HttpGet("{productCode}")]
         public ResponseProductModel? GetProduct(string productCode = "all")
         {
             var response = _productService.GetProduct(productCode);
             return response;
         }
 
-        [HttpGet]
+        [HttpGet("{productCode}")]
         public ResponseModel ClearCacheAsync(string productCode = "all")
         {
             var response = _productService.ClearCache(productCode);
