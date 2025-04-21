@@ -8,7 +8,7 @@ It shows how caching can optimize database access by storing frequently requeste
 
 ---
 
-## ⚡ Technology Stack
+## 🚀 Technology Stack
 
 - **.NET 9**
 - **ASP.NET Core Web API**
