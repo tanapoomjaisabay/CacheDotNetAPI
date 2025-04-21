@@ -103,10 +103,10 @@ Update your `appsettings.json` to match:
 
 | Endpoint | Method | Description |
 |:---|:---|:---|
-| `/api/memory/products/{id}` | GET | Fetch product using Memory Cache |
-| `/api/memory/products/clear/{id}` | DELETE | Clear specific product from Memory Cache |
-| `/api/distributed/products/{id}` | GET | Fetch product using Distributed Redis Cache |
-| `/api/distributed/products/clear/{id}` | DELETE | Clear specific product from Distributed Redis Cache |
+| `/api/productMemory/getproduct/{id}` | GET | Fetch product using Memory Cache |
+| `/api/productMemory/clearcache/{id}` | GET | Clear specific product from Memory Cache |
+| `/api/productrediscache/getproduct/{id}` | GET | Fetch product using Distributed Redis Cache |
+| `/api/productrediscache/clearcache/{id}` | GET | Clear specific product from Distributed Redis Cache |
 
 ---
 
