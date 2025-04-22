@@ -50,38 +50,45 @@ flowchart TD
 
 ### 🔑 Sample: get product via Redis cache
 
-```jsonc
-// GET /api/productRedisCache/getproduct/1
-// 1st call – miss → fetch DB → cache
-{
-  "productId": 1,
-  "name": "Demo Mouse",
-  "price": 29.9,
-  "fromCache": false
-}
+```bash
+GET /api/productRedisCache/getproduct/10001
+```
 
-// Subsequent calls – served from Redis
+Response:
+
+```jsonc
 {
-  "productId": 1,
-  "name": "Demo Mouse",
-  "price": 29.9,
-  "fromCache": true,
-  "cachedAt": "2025-04-22T15:35:00Z"
+  "data": [
+    {
+      "idKey": 1,
+      "productCode": "10001",
+      "productName": "Laptop",
+      "productDesc": "Gaming Laptop",
+      "price": 45000
+    }
+  ],
+  "status": 200,
+  "success": true,
+  "message": "",
+  "error": null
 }
 ```
 
 ### 🔑 Sample: clear memory‑cache key
 
 ```bash
-DELETE /api/productMemory/clearcache/1
+GET /api/productMemory/clearcache/10001
 ```
 
 Response:
 
 ```json
 {
+  "data": [],
   "status": 200,
-  "message": "Cache entry removed"
+  "success": true,
+  "message": "",
+  "error": null
 }
 ```
 
