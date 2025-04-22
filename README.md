@@ -1,141 +1,123 @@
-# CacheDotNetAPI
 
-## 📌 Project Overview
+# CacheDotNetAPI &nbsp;![.NET](https://img.shields.io/badge/.NET%209-512BD4?logo=dotnet&logoColor=white) ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-5C2D91?logo=dotnet&logoColor=white) ![EF Core](https://img.shields.io/badge/EF%20Core-4E4E4E) ![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 
-CacheDotNetAPI is a simple ASP.NET Core Web API demonstrating the usage of **Memory Cache** and **Distributed Cache (Redis)**.
-
-It shows how caching can optimize database access by storing frequently requested data either in-memory or in a distributed cache system like Redis. This project is built for learning and showcasing performance comparison between the two caching strategies.
+> **Educational showcase** comparing **Memory Cache** vs **Distributed Cache (Redis)** in a .NET 9 Web API.
 
 ---
 
-## 🚀 Technology Stack
+## ✨ Key Features
 
-- **.NET 9**
-- **ASP.NET Core Web API**
-- **Entity Framework Core** (Database ORM)
-- **SQL Server 2022** (via Docker)
-- **Redis** (via Docker)
-- **MemoryCache** (In-Memory Caching)
-- **DistributedCache** (Redis-based Caching)
-- **Swagger UI** (API documentation)
-
----
-
-## 🏛 Project Architecture
-
-- **Controllers**: Handle incoming API requests.
-- **Services**: Business logic for fetching, caching, and clearing data.
-- **Entities**: Database models (e.g., Product).
-- **DataAccess**: EF Core DbContext for database access.
-
-Two services:
-- `ProductMemoryCacheService` for **Memory Cache**
-- `ProductDistributedCacheService` for **Redis Cache**
+| Area | Details |
+|------|---------|
+| **Dual Caching Strategies** | Toggle between `IMemoryCache` and `IDistributedCache` (Redis) via dedicated controllers |
+| **EF Core + SQL Server** | Products fetched from DB, then cached for repeat hits |
+| **Cache Invalidation** | Clear single‑key or full cache through API |
+| **Observable Metrics** | Serilog console output + `/healthz` endpoint |
+| **Docker First** | One‑command `docker compose` for SQL Server + Redis |
+| **Swagger Docs** | Try requests directly in the browser |
 
 ---
 
-## 🚀 Getting Started
+## 🗂️ Project Structure
 
-### Prerequisites
-- [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download)
-- [Docker](https://docs.docker.com/get-docker/)
+```mermaid
+flowchart TD
+    subgraph API
+        C1[ProductMemoryController] --> S1[MemoryCacheService]
+        C2[ProductRedisController]  --> S2[RedisCacheService]
+    end
+    subgraph Cache
+        S1 --> MC[(MemoryCache)]
+        S2 --> RC[(Redis)]
+    end
+    MC & RC --> DB[(SQL Server)]
+```
 
-### Clone the Repository
+> - `MemoryCacheService` caches **in‑process** (fastest, but per‑instance)  
+> - `RedisCacheService` caches in **Redis** (shared across pods / servers)
+
+---
+
+## 📚 REST Endpoints
+
+| Controller | Verb | Path | Description |
+|------------|------|------|-------------|
+| Memory | `GET` | `/api/productMemory/getproduct/{id}` | Get product (memory cache) |
+| Memory | `DELETE` | `/api/productMemory/clearcache/{id}` | Remove product from memory cache |
+| Distributed | `GET` | `/api/productRedisCache/getproduct/{id}` | Get product (Redis cache) |
+| Distributed | `DELETE` | `/api/productRedisCache/clearcache/{id}` | Remove product from Redis cache |
+| Global | `GET` | `/healthz` | Readiness / liveness probe |
+
+### 🔑 Sample: get product via Redis cache
+
+```jsonc
+// GET /api/productRedisCache/getproduct/1
+// 1st call – miss → fetch DB → cache
+{
+  "productId": 1,
+  "name": "Demo Mouse",
+  "price": 29.9,
+  "fromCache": false
+}
+
+// Subsequent calls – served from Redis
+{
+  "productId": 1,
+  "name": "Demo Mouse",
+  "price": 29.9,
+  "fromCache": true,
+  "cachedAt": "2025-04-22T15:35:00Z"
+}
+```
+
+### 🔑 Sample: clear memory‑cache key
+
 ```bash
-git clone https://github.com/tanapoomjaisabay/CacheDotNetAPI.git
-cd CacheDotNetAPI
+DELETE /api/productMemory/clearcache/1
 ```
 
-### Setup Docker Containers
-```bash
-docker-compose up -d
-```
-This command will start both Redis and SQL Server.
+Response:
 
-### Apply Database Migrations (Optional)
-If needed, apply EF Core migrations manually.
-
-### Run the Application
-```bash
-dotnet run --project CacheDotNetAPI
-```
-
-Navigate to: `https://localhost:<port>/swagger`
-
----
-
-## 🐳 Docker Compose Setup
-
-Create a `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-services:
-  redis:
-    image: redis:latest
-    container_name: cache_redis
-    ports:
-      - "6379:6379"
-    restart: always
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: cache_mssql
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong!Passw0rd
-    ports:
-      - "1433:1433"
-    restart: always
-```
-
-Update your `appsettings.json` to match:
 ```json
-"ConnectionStrings": {
-  "DemoContext": "Server=localhost,1433;Database=DemoDb;User Id=sa;Password=YourStrong!Passw0rd;",
-  "RedisConnection": "localhost:6379"
+{
+  "status": 200,
+  "message": "Cache entry removed"
 }
 ```
 
 ---
 
-## 🔥 API Endpoints
+## 🚀 Quick Start
 
-| Endpoint | Method | Description |
-|:---|:---|:---|
-| `/api/productMemory/getproduct/{id}` | GET | Fetch product using Memory Cache |
-| `/api/productMemory/clearcache/{id}` | GET | Clear specific product from Memory Cache |
-| `/api/productrediscache/getproduct/{id}` | GET | Fetch product using Distributed Redis Cache |
-| `/api/productrediscache/clearcache/{id}` | GET | Clear specific product from Distributed Redis Cache |
-
----
-
-## 🛠️ Health Check
-
-| Endpoint | Description |
-|:---|:---|
-| `/healthz` | Check application health |
-
----
-
-## 📄 Sample Requests
-
-**Get Product (Memory Cache)**
 ```bash
-curl -X GET "https://localhost:<port>/api/memory/products/1"
+git clone https://github.com/tanapoomjaisabay/CacheDotNetAPI.git
+cd CacheDotNetAPI
+docker compose up -d        # spin up redis + sqlserver
+dotnet run --project CacheDotNetAPI
 ```
 
-**Clear Product Cache (Distributed Cache)**
-```bash
-curl -X DELETE "https://localhost:<port>/api/distributed/products/clear/1"
-```
+Swagger UI → <https://localhost:5000/swagger>
 
 ---
 
-## 🙌🏻 Credit
+## 🛠️ Tech Stack
 
-Created by [Tanapoom Jaisabay](https://github.com/tanapoomjaisabay). 
+- **ASP.NET Core 9** Web API  
+- **EF Core** code‑first  
+- **SQL Server 2022** (Docker)  
+- **Redis 7** (Docker)  
+- **Serilog** logging  
+- **Docker Compose**  
+- **GitHub Actions** (CI)
 
-This project is built for educational purposes to demonstrate caching strategies in modern .NET applications.
+---
 
-Happy Coding! 🌟
+## 🤝 Contributing
+
+PRs are welcome! Feel free to open issues, suggest refactors, or add new features.
+
+---
+
+## 📜 License
+
+Distributed under the **MIT** license. See `LICENSE` for more info.
