@@ -74,10 +74,54 @@ Response:
 }
 ```
 
+### 🔑 Sample: clear product via Redis cache
+
+```bash
+GET /api/productRedisCache/clearcache/10001
+```
+
+Response:
+
+```json
+{
+  "data": [],
+  "status": 200,
+  "success": true,
+  "message": "",
+  "error": null
+}
+```
+
+### 🔑 Sample: get product via memory‑cache
+
+```bash
+GET /api/productMemory/getproduct/20002
+```
+
+Response:
+
+```jsonc
+{
+  "data": [
+    {
+      "idKey": 2,
+      "productCode": "20002",
+      "productName": "Phone",
+      "productDesc": "Smartphone",
+      "price": 15000
+    }
+  ],
+  "status": 200,
+  "success": true,
+  "message": "",
+  "error": null
+}
+```
+
 ### 🔑 Sample: clear memory‑cache key
 
 ```bash
-GET /api/productMemory/clearcache/10001
+GET /api/productMemory/clearcache/20002
 ```
 
 Response:
