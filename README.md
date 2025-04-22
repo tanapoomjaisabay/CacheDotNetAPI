@@ -107,8 +107,7 @@ Swagger UI → <https://localhost:5000/swagger>
 - **SQL Server 2022** (Docker)  
 - **Redis 7** (Docker)  
 - **Serilog** logging  
-- **Docker Compose**  
-- **GitHub Actions** (CI)
+- **Docker Compose** 
 
 ---
 
