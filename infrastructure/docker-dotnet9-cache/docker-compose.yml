@@ -1,0 +1,51 @@
+
+version: "3.9"
+
+networks:
+  cache_net:
+    driver: bridge
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - cache_net
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "Your_password123", "-Q", "SELECT 1"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7
+    container_name: redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    networks:
+      - cache_net
+
+  cache-api:
+    build:
+      context: ./src/CacheDotNetAPI
+      dockerfile: Dockerfile
+    container_name: cache-dotnet-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=CacheDb;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
+      CacheSettings__RedisConnection: "redis:6379"
+    ports:
+      - "5000:8080"
+    networks:
+      - cache_net
