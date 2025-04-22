@@ -18,6 +18,17 @@
 
 ---
 
+## 🛠️ Tech Stack
+
+- **ASP.NET Core 9** Web API  
+- **EF Core** code‑first  
+- **SQL Server 2022** (Docker)  
+- **Redis 7** (Docker)  
+- **Serilog** logging  
+- **Docker Compose**
+
+---
+
 ## 🗂️ Project Structure
 
 ```mermaid
@@ -148,17 +159,6 @@ dotnet run --project CacheDotNetAPI
 ```
 
 Swagger UI → <https://localhost:5000/swagger>
-
----
-
-## 🛠️ Tech Stack
-
-- **ASP.NET Core 9** Web API  
-- **EF Core** code‑first  
-- **SQL Server 2022** (Docker)  
-- **Redis 7** (Docker)  
-- **Serilog** logging  
-- **Docker Compose** 
 
 ---
 
